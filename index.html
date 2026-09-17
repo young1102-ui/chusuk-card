@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>한가위 카드 스튜디오</title>
+<style>
+:root{
+  --bg:#FFFFFF;
+  --bg-2:#F7FBFF;
+  --surface:#FFFFFF;
+  --surface-2:#F7FAFF;
+  --ink:#162432;
+  --ink-soft:#5E6D79;
+  --blue:#246BFD;
+  --blue-2:#5BC0FF;
+  --teal:#19C7A7;
+  --coral:#FF7366;
+  --yellow:#FFC935;
+  --lav:#A88BFF;
+  --peach:#FFB47C;
+  --line:rgba(22,36,50,.08);
+  --line-2:rgba(36,107,253,.12);
+  --shadow:0 24px 56px rgba(27,76,140,.08);
+  --shadow-sm:0 10px 24px rgba(27,76,140,.07);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  font-family:Pretendard,"Noto Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at 10% 8%, rgba(91,192,255,.13), transparent 24%),
+    radial-gradient(circle at 90% 12%, rgba(25,199,167,.10), transparent 24%),
+    radial-gradient(circle at 50% 100%, rgba(255,180,124,.08), transparent 30%),
+    linear-gradient(180deg,var(--bg),var(--bg-2));
+}
+button,input,textarea{font:inherit}
+button{
+  cursor:pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:transform .16s ease, box-shadow .22s ease, background .22s ease, border-color .22s ease, color .22s ease, filter .22s ease;
+}
+button:focus-visible{
+  outline:3px solid rgba(36,107,253,.22);
+  outline-offset:2px;
+}
+.app{
+  width:min(100%,1080px);
+  margin:0 auto;
+  padding:26px 18px 120px;
+}
+.hero{margin-bottom:18px}
+.badge{
+  display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:10px 14px;
+  background:#F4F9FF;border:1px solid rgba(36,107,253,.16);color:#1554D1;
+  box-shadow:0 8px 18px rgba(36,107,253,.05);font-size:14px;font-weight:800;
+}
+h1{
+  font-size:clamp(36px,4.8vw,56px);line-height:1.07;margin:14px 0 10px;letter-spacing:-.04em;
+}
+.hero p{margin:0;font-size:18px;line-height:1.7;color:var(--ink-soft)}
+
+.shell{
+  background:rgba(255,255,255,.96);border:1px solid rgba(255,255,255,.85);border-radius:34px;
+  box-shadow:var(--shadow);overflow:hidden;
+}
+.topbar{
+  padding:20px 24px 16px;border-bottom:1px solid rgba(22,36,50,.06);
+  background:
+    radial-gradient(circle at 92% -10%, rgba(255,201,53,.14), transparent 26%),
+    linear-gradient(180deg,#FFFFFF,#FAFCFF);
+}
+.topmeta{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:12px}
+.steplabel{font-size:15px;font-weight:900;color:var(--blue)}
+.stepcount{font-size:14px;color:var(--ink-soft)}
+.progress{height:10px;border-radius:999px;background:rgba(36,107,253,.10);overflow:hidden}
+.progress > div{
+  height:100%;width:14.28%;border-radius:inherit;background:linear-gradient(90deg,var(--blue),var(--teal),var(--yellow));transition:width .28s ease;
+}
+.content{padding:28px 24px 26px}
+.step{max-width:980px;margin:0 auto}
+.step-head{margin-bottom:22px}
+.step-title{margin:0 0 8px;font-size:clamp(30px,4.2vw,46px);line-height:1.18;letter-spacing:-.04em}
+.step-desc{margin:0;font-size:19px;line-height:1.7;color:var(--ink-soft)}
+
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.choice-card,.chip,.small-btn,.btn,.position-btn{position:relative;overflow:hidden}
+.choice-card::before,.chip::before,.small-btn::before,.btn::before,.position-btn::before{
+  content:"";position:absolute;left:1px;right:1px;top:1px;height:42%;border-radius:inherit;
+  background:linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,0));pointer-events:none;
+}
+.choice-card{
+  position:relative;background:linear-gradient(180deg,#FFFFFF,#FBFDFF);border:1px solid var(--line-2);
+  border-radius:24px;padding:22px 20px;min-height:136px;text-align:left;box-shadow:var(--shadow-sm);
+}
+.choice-card:hover{transform:translateY(-3px);box-shadow:0 18px 30px rgba(36,107,253,.10)}
+.choice-card:active{transform:translateY(1px) scale(.992)}
+.choice-card.active{
+  background:linear-gradient(180deg,#FFFFFF,#EEF5FF);border-color:rgba(36,107,253,.48);box-shadow:0 16px 30px rgba(36,107,253,.12);
+}
+.choice-card.active::after{
+  content:"✓";position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:50%;
+  display:grid;place-items:center;font-weight:800;color:#fff;background:linear-gradient(180deg,#246BFD,#1759D8);font-size:15px;
+  box-shadow:0 8px 14px rgba(36,107,253,.18);
+}
+.choice-card strong{display:block;font-size:24px;line-height:1.25;margin-bottom:8px;letter-spacing:-.03em}
+.choice-card span{display:block;font-size:15px;line-height:1.65;color:var(--ink-soft)}
+
+.chips{display:flex;flex-wrap:wrap;gap:14px}
+.chip{
+  min-height:58px;padding:0 24px;border-radius:999px;border:1px solid rgba(36,107,253,.16);background:linear-gradient(180deg,#FFFFFF,#F8FBFF);
+  color:var(--ink);box-shadow:0 8px 16px rgba(36,107,253,.05);font-size:18px;line-height:1;font-weight:800;letter-spacing:-.03em;
+}
+.chip:hover{transform:translateY(-2px)}
+.chip.active{
+  color:#fff;background:linear-gradient(180deg,#246BFD,#185FE2);border-color:#185FE2;box-shadow:0 12px 22px rgba(36,107,253,.20);
+}
+.palette{display:flex;gap:8px;margin-top:16px}
+.dot{width:18px;height:18px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.05)}
+.field{margin-top:16px}
+.text-input,.output{width:100%;border-radius:18px;border:1px solid var(--line);background:#fff;color:var(--ink)}
+.text-input{height:58px;padding:0 18px;font-size:18px}
+.output{min-height:320px;resize:vertical;padding:18px 18px;font-size:16px;line-height:1.72}
+
+.category-tabs{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 18px}
+.cat-tab{
+  min-height:44px;padding:0 16px;border-radius:999px;background:linear-gradient(180deg,#FFFFFF,#F7FAFF);
+  border:1px solid rgba(36,107,253,.14);color:#446175;font-size:14px;font-weight:900;
+  box-shadow:0 8px 16px rgba(36,107,253,.04);
+}
+.cat-tab:hover{transform:translateY(-1px)}
+.cat-tab.active{
+  background:linear-gradient(135deg,#246BFD,#17C3A2);color:white;border-color:transparent;box-shadow:0 12px 24px rgba(36,107,253,.18);
+}
+
+.concept-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
+.concept-card{border:none;background:transparent;padding:0;text-align:left}
+.concept-card:hover{transform:translateY(-2px)}
+.poster{
+  position:relative;aspect-ratio:4/5;border-radius:28px;overflow:hidden;border:1px solid rgba(36,107,253,.10);
+  background:#F7FBFF;box-shadow:0 16px 30px rgba(36,107,253,.08);
+}
+.concept-card.active .poster{outline:3px solid rgba(36,107,253,.40);outline-offset:3px}
+.poster .moon{position:absolute;width:68px;height:68px;border-radius:50%;background:rgba(255,216,77,.96);box-shadow:0 0 26px rgba(255,216,77,.35)}
+.poster .sun{position:absolute;width:62px;height:62px;border-radius:50%;background:rgba(255,126,112,.92);box-shadow:0 0 22px rgba(255,126,112,.24)}
+.poster .cloud{position:absolute;height:12px;border-radius:999px;background:rgba(255,255,255,.65)}
+.poster .land{position:absolute;left:-8px;right:-8px;bottom:0;height:34%;border-radius:48% 48% 0 0 / 16% 16% 0 0}
+.poster .mount{position:absolute;border-radius:60% 60% 0 0 / 90% 90% 0 0}
+.poster .pouch{position:absolute;width:88px;height:96px;border-radius:30% 30% 44% 44%;background:linear-gradient(160deg,#FF8A65,#FF6B5E)}
+.poster .pouch:before{content:"";position:absolute;left:18px;right:18px;top:-9px;height:16px;border-radius:50%;background:#FFE9C1}
+.poster .rabbit{position:absolute;width:66px;height:76px;border-radius:42% 42% 38% 38%;background:#F4F0E7}
+.poster .rabbit:before,.poster .rabbit:after{content:"";position:absolute;top:-28px;width:18px;height:40px;border-radius:999px;background:#F4F0E7}
+.poster .rabbit:before{left:8px;transform:rotate(-6deg)}
+.poster .rabbit:after{right:8px;transform:rotate(6deg)}
+.poster .flower{position:absolute;border-radius:50%;border:8px dotted rgba(255,255,255,.86)}
+.poster .window{position:absolute;inset:18px;border-radius:18px;border:2px solid rgba(120,86,45,.18)}
+.poster .windowgrid{position:absolute;inset:18px;border-radius:18px;background:
+  linear-gradient(90deg,transparent 23%, rgba(120,86,45,.10) 23% 25%, transparent 25% 48%, rgba(120,86,45,.10) 48% 50%, transparent 50% 73%, rgba(120,86,45,.10) 73% 75%, transparent 75%),
+  linear-gradient(0deg,transparent 24%, rgba(120,86,45,.10) 24% 26%, transparent 26% 49%, rgba(120,86,45,.10) 49% 51%, transparent 51% 74%, rgba(120,86,45,.10) 74% 76%, transparent 76%);
+}
+.poster .ribbon{position:absolute;border-radius:999px}
+.poster .leaf{position:absolute;border-radius:80% 0 80% 0;transform:rotate(20deg)}
+.poster .crane{position:absolute;width:44px;height:18px;border-top:3px solid rgba(40,52,74,.42);border-radius:50%}
+.poster .arch{position:absolute;border-radius:999px 999px 0 0}
+.poster .panel{position:absolute;border-radius:22px}
+.poster .ginkgo{position:absolute;width:54px;height:54px;border-radius:50% 50% 8% 8%;clip-path: polygon(50% 100%, 0 55%, 15% 15%, 35% 0, 50% 18%, 65% 0, 85% 15%, 100% 55%)}
+
+.poster.theme-hanji{background:linear-gradient(180deg,#FCF7EC,#F6EBD8)}
+.poster.theme-trad{background:linear-gradient(180deg,#FFF8EA,#FFF0E8)}
+.poster.theme-garden{background:linear-gradient(180deg,#F3FBFF,#F5FFF8)}
+.poster.theme-night{background:linear-gradient(180deg,#EEF6FF,#F5FBFF)}
+.poster.theme-modern{background:linear-gradient(180deg,#F3F8FF,#F8FBFF)}
+.poster.theme-flower{background:linear-gradient(180deg,#F8FCFF,#FFF8F8)}
+
+.concept-info{margin-top:12px;display:flex;gap:12px;align-items:flex-start;justify-content:space-between}
+.concept-copy{min-width:0}
+.concept-badge{
+  display:inline-flex;align-items:center;min-height:28px;padding:0 10px;border-radius:999px;background:#EEF5FF;color:#2360C5;
+  font-size:12px;font-weight:900;margin-bottom:8px;
+}
+.concept-card h3{font-size:20px;margin:0 0 6px;letter-spacing:-.03em;line-height:1.35}
+.concept-card p{margin:0;font-size:14px;line-height:1.58;color:var(--ink-soft)}
+.concept-cta{
+  flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 15px;border-radius:999px;
+  background:linear-gradient(180deg,#FFFFFF,#F5F9FF);border:1px solid rgba(36,107,253,.14);color:#246BFD;font-size:13px;font-weight:900;
+  box-shadow:0 8px 14px rgba(36,107,253,.06);
+}
+.concept-card.active .concept-cta{
+  background:linear-gradient(180deg,#17C3A2,#11AA8D);color:#fff;border-color:#11AA8D;box-shadow:0 10px 18px rgba(23,195,162,.22);
+}
+.concept-card.active .concept-cta::before{content:"✓ "}
+
+.density-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:24px}
+.density-grid .choice-card{min-height:120px;text-align:center}
+.density-grid .choice-card strong{font-size:22px;margin-bottom:10px}
+
+.message-list{display:grid;gap:14px}
+.message-card{
+  position:relative;border:1px solid var(--line);border-radius:24px;background:linear-gradient(180deg,#FFFFFF,#FFFDFC);
+  padding:28px 26px 56px;min-height:180px;display:flex;align-items:center;justify-content:center;text-align:center;
+  box-shadow:0 8px 18px rgba(36,107,253,.05);
+}
+.message-card:hover{transform:translateY(-2px)}
+.message-card.active{background:linear-gradient(180deg,#FFFFFF,#FFF2EF);border-color:rgba(255,115,102,.55);box-shadow:0 14px 26px rgba(255,115,102,.14)}
+.message-text{font-size:24px;line-height:1.8;letter-spacing:-.03em}
+.pick{
+  position:absolute;right:16px;bottom:14px;min-height:38px;padding:0 14px;border:none;border-radius:999px;
+  background:linear-gradient(180deg,#FF7E70,#FF5F52);color:#fff;font-size:13px;font-weight:900;box-shadow:0 8px 16px rgba(255,107,94,.22);
+}
+.action-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.small-btn{
+  min-height:42px;padding:0 16px;border-radius:999px;border:1px solid rgba(36,107,253,.12);background:linear-gradient(180deg,#FFFFFF,#F9FCFD);
+  color:var(--ink);font-size:15px;font-weight:800;box-shadow:0 7px 14px rgba(36,107,253,.05);
+}
+.small-btn:hover{transform:translateY(-2px)}
+
+.font-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.type-card{min-height:136px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center}
+.sample{font-size:28px;line-height:1.3}
+.serif{font-family:"Noto Serif KR","Batang",serif}
+.hand{font-style:italic}
+.gothic{font-weight:800;letter-spacing:-.04em}
+.calli{font-family:"Noto Serif KR",serif;font-style:italic}
+.editorial{font-family:Georgia,"Noto Serif KR",serif}
+
+.position-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:18px}
+.position-btn{
+  background:linear-gradient(180deg,#FFFFFF,#F9FCFF);border:1px solid rgba(36,107,253,.10);border-radius:18px;
+  min-height:146px;padding:10px 8px 12px;box-shadow:0 8px 16px rgba(36,107,253,.05);
+}
+.position-btn:hover{transform:translateY(-2px)}
+.position-btn.active{background:linear-gradient(180deg,#FFFFFF,#EEFBF8);border-color:rgba(23,195,162,.56);box-shadow:0 12px 24px rgba(23,195,162,.14)}
+.mini{width:54px;margin:0 auto 8px;aspect-ratio:9/16;border-radius:12px;background:#EEF4FF;position:relative;overflow:hidden}
+.mini:after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:#FF8A65;right:7px;bottom:8px}
+.txtmark{position:absolute;width:24px;height:5px;border-radius:999px;background:#246BFD}
+.tl{left:6px;top:8px}.tc{left:50%;transform:translateX(-50%);top:8px}.cc{left:50%;top:50%;transform:translate(-50%,-50%)}.bl{left:6px;bottom:8px}.bc{left:50%;transform:translateX(-50%);bottom:8px}
+.position-btn small{display:block;font-size:12px;line-height:1.4;color:var(--ink-soft)}
+
+.final-wrap{display:grid;grid-template-columns:340px 1fr;gap:22px;align-items:start}
+.preview{
+  position:relative;width:100%;aspect-ratio:9/16;border-radius:28px;overflow:hidden;box-shadow:var(--shadow);
+  background:radial-gradient(circle at 76% 14%, rgba(255,216,77,.98) 0 8.5%, transparent 9%), linear-gradient(180deg,#F1F8FF 0%,#F4FFF9 56%,#EAF7FF 100%);
+}
+.preview:after{
+  content:"";position:absolute;left:-5%;right:-5%;bottom:0;height:38%;
+  background:linear-gradient(180deg,rgba(36,107,253,.08),rgba(25,199,167,.10));border-radius:50% 50% 0 0 / 14% 14% 0 0;
+}
+.preview .decor{
+  position:absolute;right:22px;bottom:28px;width:96px;height:108px;border-radius:30% 30% 44% 44%;
+  background:linear-gradient(160deg,#FF8A65,#FF6B5E);z-index:2;
+}
+.preview .decor:before{content:"";position:absolute;left:20px;right:20px;top:-10px;height:16px;border-radius:50%;background:#FFE8BE}
+.preview .quote{
+  position:absolute;left:26px;right:30px;top:78px;z-index:2;font-family:"Noto Serif KR",serif;font-size:21px;line-height:1.8;color:#213547;letter-spacing:-.03em;
+}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.tag{padding:8px 12px;border-radius:999px;background:#EAF3FF;color:#245EA8;font-size:13px;font-weight:800}
+.note{margin:10px 0 0;font-size:13px;color:var(--ink-soft);line-height:1.65}
+
+.footer{
+  position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.95);backdrop-filter:blur(14px);
+  border-top:1px solid rgba(22,36,50,.06);box-shadow:0 -10px 28px rgba(36,107,253,.07);
+}
+.footer-inner{
+  width:min(100%,1080px);margin:0 auto;padding:12px 18px calc(12px + env(safe-area-inset-bottom));display:flex;gap:12px;
+}
+.btn{height:58px;border-radius:18px;padding:0 22px;font-size:17px;font-weight:900}
+.btn.secondary{
+  min-width:112px;border:1px solid rgba(36,107,253,.12);background:linear-gradient(180deg,#FFFFFF,#F7FAFF);color:#344252;box-shadow:0 10px 18px rgba(36,107,253,.05);
+}
+.btn.secondary:hover{transform:translateY(-2px)}
+.btn.primary{
+  flex:1;border:none;color:#fff;background:linear-gradient(135deg,#246BFD 0%, #17C3A2 100%);
+  box-shadow:0 16px 32px rgba(36,107,253,.22), inset 0 1px 0 rgba(255,255,255,.24);
+}
+.btn.primary:hover:not(:disabled){transform:translateY(-2px) scale(1.01);box-shadow:0 22px 38px rgba(36,107,253,.28), inset 0 1px 0 rgba(255,255,255,.24)}
+.btn.primary:disabled{opacity:.42;cursor:not-allowed;transform:none}
+
+#finalBack{
+  background:linear-gradient(180deg,#FFFFFF,#EEF5FF)!important;
+  border-color:rgba(36,107,253,.24)!important;
+  color:#246BFD!important;
+  box-shadow:0 8px 16px rgba(36,107,253,.08)!important;
+}
+#finalBack:hover{
+  transform:translateY(-2px);
+  box-shadow:0 12px 20px rgba(36,107,253,.13)!important;
+}
+#copyPrompt{background:linear-gradient(180deg,#246BFD,#185FE2)!important;border-color:#185FE2!important;color:#fff!important;box-shadow:0 12px 22px rgba(36,107,253,.22)!important}
+#copyMessage{background:linear-gradient(180deg,#FFF9EE,#FFF3CD)!important;border-color:rgba(255,200,61,.55)!important;color:#9A6F00!important}
+
+.hidden{display:none!important}
+
+@media (max-width: 960px){
+  .app{padding:18px 12px 118px}
+  .topbar,.content{padding-left:18px;padding-right:18px}
+  .concept-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .final-wrap{grid-template-columns:1fr}
+  .preview{max-width:340px;margin:0 auto}
+}
+@media (max-width: 640px){
+  h1{font-size:34px}
+  .hero p{font-size:16px}
+  .shell{border-radius:24px}
+  .step-title{font-size:24px}
+  .step-desc{font-size:16px}
+  .grid-2,.font-grid{grid-template-columns:1fr}
+  .choice-card{min-height:118px;padding:18px}
+  .choice-card strong{font-size:21px}
+  .chips{gap:10px}
+  .chip{font-size:16px;min-height:52px;padding:0 18px}
+  .concept-grid{grid-template-columns:1fr}
+  .concept-card h3{font-size:19px}
+  .message-text{font-size:18px}
+  .sample{font-size:23px}
+  .position-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .position-btn{min-height:128px}
+  .mini{width:48px}
+  .density-grid{grid-template-columns:1fr}
+  .topmeta{display:block}
+  .stepcount{margin-top:4px}
+  .footer-inner{padding-left:12px;padding-right:12px}
+  .btn{height:54px;font-size:16px}
+}
+
+/* --- premium thumbnail upgrade --- */
+.poster{
+  box-shadow:
+    0 18px 36px rgba(36,107,253,.10),
+    0 8px 18px rgba(23,195,162,.05);
+}
+.poster::before{
+  content:"";
+  position:absolute;
+  inset:10px;
+  border-radius:22px;
+  border:1px solid rgba(255,255,255,.62);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.65);
+  pointer-events:none;
+}
+.poster::after{
+  content:"";
+  position:absolute;
+  left:0; right:0; top:0;
+  height:42%;
+  background:linear-gradient(180deg, rgba(255,255,255,.34), rgba(255,255,255,0));
+  pointer-events:none;
+}
+.poster .sparkle{
+  position:absolute;
+  width:6px;height:6px;border-radius:50%;
+  background:rgba(255,255,255,.82);
+  box-shadow:0 0 12px rgba(255,255,255,.65);
+}
+.poster .mist{
+  position:absolute;
+  left:12px; right:12px; bottom:56px;
+  height:34px;
+  background:linear-gradient(180deg, rgba(255,255,255,.34), rgba(255,255,255,0));
+  filter:blur(8px);
+  border-radius:999px;
+}
+.poster .stamp{
+  position:absolute;
+  left:14px; top:14px;
+  min-height:24px;
+  padding:0 10px;
+  display:inline-flex;
+  align-items:center;
+  border-radius:999px;
+  background:rgba(255,255,255,.72);
+  border:1px solid rgba(255,255,255,.75);
+  backdrop-filter:blur(4px);
+  color:#3F5E8C;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.02em;
+  z-index:2;
+}
+.poster .frame{
+  position:absolute;
+  inset:18px;
+  border-radius:20px;
+  border:1px solid rgba(36,107,253,.08);
+  pointer-events:none;
+}
+.poster .titlechip{
+  position:absolute;
+  left:18px; right:18px; bottom:16px;
+  min-height:34px;
+  display:flex;
+  align-items:center;
+  padding:0 12px;
+  border-radius:14px;
+  background:rgba(255,255,255,.72);
+  backdrop-filter:blur(6px);
+  border:1px solid rgba(255,255,255,.78);
+  color:#2C4664;
+  font-size:12px;
+  font-weight:900;
+  line-height:1.2;
+  z-index:2;
+}
+.poster.theme-hanji .titlechip{color:#6A5A43}
+.poster.theme-trad .titlechip{color:#7B4E41}
+.poster.theme-garden .titlechip{color:#426A63}
+.poster.theme-night .titlechip{color:#3D5A80}
+.poster.theme-modern .titlechip{color:#2D508E}
+.poster.theme-flower .titlechip{color:#7C5A72}
+.poster.theme-hanji{background:
+  radial-gradient(circle at 80% 14%, rgba(255,217,109,.28), transparent 18%),
+  linear-gradient(180deg,#FCF7EC,#F6EBD8) !important}
+.poster.theme-trad{background:
+  radial-gradient(circle at 82% 14%, rgba(255,215,127,.30), transparent 18%),
+  linear-gradient(180deg,#FFF8EA,#FFF0E8) !important}
+.poster.theme-garden{background:
+  radial-gradient(circle at 80% 14%, rgba(255,216,77,.28), transparent 18%),
+  linear-gradient(180deg,#F3FBFF,#F5FFF8) !important}
+.poster.theme-night{background:
+  radial-gradient(circle at 82% 14%, rgba(255,216,77,.34), transparent 18%),
+  linear-gradient(180deg,#EEF6FF,#F5FBFF) !important}
+.poster.theme-modern{background:
+  radial-gradient(circle at 82% 14%, rgba(91,192,255,.18), transparent 18%),
+  linear-gradient(180deg,#F3F8FF,#F8FBFF) !important}
+.poster.theme-flower{background:
+  radial-gradient(circle at 82% 14%, rgba(255,200,220,.16), transparent 18%),
+  linear-gradient(180deg,#F8FCFF,#FFF8F8) !important}
+.concept-card.active .poster{
+  outline:3px solid rgba(36,107,253,.44);
+  outline-offset:4px;
+  box-shadow:
+    0 22px 40px rgba(36,107,253,.14),
+    0 10px 22px rgba(23,195,162,.07);
+}
+.concept-badge{
+  background:linear-gradient(180deg,#F4F8FF,#EAF4FF) !important;
+  border:1px solid rgba(36,107,253,.10);
+}
+
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="hero">
+    <span class="badge">◐ 추석 카드 프롬프트 메이커</span>
+    <h1>한가위 카드 스튜디오</h1>
+    <p>배경, 글씨, 문구까지 한 번에 잡아주는 완성형 추석 카드 프롬프트 앱</p>
+  </header>
+
+  <section class="shell">
+    <div class="topbar">
+      <div class="topmeta">
+        <div class="steplabel" id="stepLabel">STEP 1 · 관계 선택</div>
+        <div class="stepcount" id="stepCount">1 / 7</div>
+      </div>
+      <div class="progress"><div id="bar"></div></div>
+    </div>
+
+    <div class="content">
+      <section class="step" data-step="1">
+        <div class="step-head">
+          <h2 class="step-title">누구에게 보내는 카드인가요?</h2>
+          <p class="step-desc">받는 사람에 따라 문구의 거리감과 분위기를 맞춰드릴게요.</p>
+        </div>
+        <div class="grid-2" id="relationChoices">
+          <button class="choice-card" data-value="부모님"><strong>부모님</strong><span>안부와 감사가 자연스럽게 느껴지는 카드</span></button>
+          <button class="choice-card" data-value="친한 친구"><strong>친한 친구</strong><span>다정하고 편안한 말투의 카드</span></button>
+          <button class="choice-card" data-value="직장·지인"><strong>직장·지인</strong><span>정중하지만 딱딱하지 않은 카드</span></button>
+          <button class="choice-card" data-value="직접 입력"><strong>직접 입력</strong><span>원하는 관계를 직접 적어 주세요</span></button>
+        </div>
+        <div class="field hidden" id="customRelationWrap">
+          <input class="text-input" id="customRelation" placeholder="예: 사촌언니, 은사님, 오래된 동료" />
+        </div>
+      </section>
+
+      <section class="step hidden" data-step="2">
+        <div class="step-head">
+          <h2 class="step-title">어떤 마음을 전하고 싶나요?</h2>
+          <p class="step-desc">2개까지 고르면 더 자연스러운 문구가 나와요.</p>
+        </div>
+        <div class="chips" id="feelingChoices">
+          <button class="chip" data-value="안부">안부</button>
+          <button class="chip" data-value="감사">감사</button>
+          <button class="chip" data-value="응원">응원</button>
+          <button class="chip" data-value="건강">건강</button>
+          <button class="chip" data-value="격려">격려</button>
+          <button class="chip" data-value="그리움">그리움</button>
+        </div>
+      </section>
+
+      <section class="step hidden" data-step="3">
+        <div class="step-head">
+          <h2 class="step-title">카드 분위기를 골라주세요</h2>
+          <p class="step-desc">색감과 장식, 전체 톤에 반영됩니다.</p>
+        </div>
+        <div class="grid-2" id="moodChoices">
+          <button class="choice-card" data-value="따뜻한"><strong>따뜻한</strong><span>포근하고 편안한 느낌</span><div class="palette"><i class="dot" style="background:#FFB47C"></i><i class="dot" style="background:#FFD84D"></i><i class="dot" style="background:#FFF1E6"></i></div></button>
+          <button class="choice-card" data-value="세련된"><strong>세련된</strong><span>균형감 있고 깔끔한 느낌</span><div class="palette"><i class="dot" style="background:#246BFD"></i><i class="dot" style="background:#5BC0FF"></i><i class="dot" style="background:#F5F9FF"></i></div></button>
+          <button class="choice-card" data-value="전통적인"><strong>전통적인</strong><span>한국적 소재를 현대적으로 표현</span><div class="palette"><i class="dot" style="background:#FF7366"></i><i class="dot" style="background:#FFC935"></i><i class="dot" style="background:#FFF4E7"></i></div></button>
+          <button class="choice-card" data-value="감성적인"><strong>감성적인</strong><span>잔잔하고 여운이 남는 느낌</span><div class="palette"><i class="dot" style="background:#A88BFF"></i><i class="dot" style="background:#5BC0FF"></i><i class="dot" style="background:#F6F3FF"></i></div></button>
+          <button class="choice-card" data-value="귀여운"><strong>귀여운</strong><span>부담 없이 사랑스러운 느낌</span><div class="palette"><i class="dot" style="background:#FF8A65"></i><i class="dot" style="background:#FFD84D"></i><i class="dot" style="background:#FFF8E8"></i></div></button>
+          <button class="choice-card" data-value="고급스러운"><strong>고급스러운</strong><span>절제된 장식과 깊이 있는 완성도</span><div class="palette"><i class="dot" style="background:#246BFD"></i><i class="dot" style="background:#17C3A2"></i><i class="dot" style="background:#FFF6DE"></i></div></button>
+        </div>
+      </section>
+
+      <section class="step hidden" data-step="4">
+        <div class="step-head">
+          <h2 class="step-title">콘셉트를 골라주세요</h2>
+          <p class="step-desc">20개의 개성 있는 추석 카드 콘셉트를 카테고리별로 모아두었어요. 누가 봐도 추석답고, 카드답게 보이도록 구성했습니다.</p>
+        </div>
+        <div class="category-tabs" id="conceptCategoryTabs"></div>
+        <div class="concept-grid" id="conceptGrid"></div>
+
+        <div class="density-grid" id="densityChoices">
+          <button class="choice-card" data-value="미니멀"><strong>미니멀</strong><span>여백 중심, 장식은 절제</span></button>
+          <button class="choice-card active" data-value="적당히 풍성"><strong>적당히 풍성</strong><span>가장 추천, 균형형</span></button>
+          <button class="choice-card" data-value="화려하게"><strong>화려하게</strong><span>장식과 존재감 강조</span></button>
+        </div>
+      </section>
+
+      <section class="step hidden" data-step="5">
+        <div class="step-head">
+          <h2 class="step-title">인사말을 골라주세요</h2>
+          <p class="step-desc">관계별로 10개 이상 준비했어요. 카드에 바로 넣기 좋게 2~3줄로 정리했습니다.</p>
+        </div>
+        <div class="message-list" id="messageChoices"></div>
+        <div class="action-row">
+          <button class="small-btn" id="toneWarm">더 다정하게</button>
+          <button class="small-btn" id="toneFun">더 유쾌하게</button>
+          <button class="small-btn" id="toneShort">더 짧게</button>
+        </div>
+        <div class="field">
+          <textarea id="customMessage" class="output" style="min-height:120px" placeholder="원하는 인사말을 직접 입력해도 됩니다."></textarea>
+        </div>
+      </section>
+
+      <section class="step hidden" data-step="6">
+        <div class="step-head">
+          <h2 class="step-title">글씨 스타일과 위치를 골라주세요</h2>
+          <p class="step-desc">배경과 문구가 함께 어울리도록 프롬프트에 반영됩니다.</p>
+        </div>
+        <div class="font-grid" id="fontChoices">
+          <button class="choice-card type-card" data-value="따뜻한 손글씨"><div class="sample hand">즐거운 한가위</div><span>따뜻한 손글씨</span></button>
+          <button class="choice-card type-card active" data-value="단정한 명조"><div class="sample serif">즐거운 한가위</div><span>단정한 명조</span></button>
+          <button class="choice-card type-card" data-value="세련된 고딕"><div class="sample gothic">즐거운 한가위</div><span>세련된 고딕</span></button>
+          <button class="choice-card type-card" data-value="고급 캘리그래피"><div class="sample calli">즐거운 한가위</div><span>고급 캘리그래피</span></button>
+          <button class="choice-card type-card" data-value="감성 에디토리얼"><div class="sample editorial">즐거운 한가위</div><span>감성 에디토리얼</span></button>
+        </div>
+
+        <div class="position-grid" id="positionChoices">
+          <button class="position-btn active" data-value="상단 왼쪽"><div class="mini"><span class="txtmark tl"></span></div><small>상단 왼쪽</small></button>
+          <button class="position-btn" data-value="상단 중앙"><div class="mini"><span class="txtmark tc"></span></div><small>상단 중앙</small></button>
+          <button class="position-btn" data-value="중앙"><div class="mini"><span class="txtmark cc"></span></div><small>중앙</small></button>
+          <button class="position-btn" data-value="하단 왼쪽"><div class="mini"><span class="txtmark bl"></span></div><small>하단 왼쪽</small></button>
+          <button class="position-btn" data-value="하단 중앙"><div class="mini"><span class="txtmark bc"></span></div><small>하단 중앙</small></button>
+        </div>
+      </section>
+
+      <section class="step hidden" data-step="7">
+        <div class="step-head">
+          <h2 class="step-title">카드 프롬프트가 완성됐어요</h2>
+          <p class="step-desc">아래 프롬프트를 그대로 이미지 생성 AI에 넣으면 됩니다.</p>
+        </div>
+        <div class="final-wrap">
+          <div class="preview">
+            <div class="quote" id="previewText"></div>
+            <div class="decor"></div>
+          </div>
+          <div>
+            <div class="tags" id="tags"></div>
+            <textarea id="finalPrompt" class="output"></textarea>
+            <div class="action-row">
+              <button class="small-btn" id="finalBack">← 이전</button>
+              <button class="small-btn" id="copyPrompt">프롬프트 복사</button>
+              <button class="small-btn" id="copyMessage">문구만 복사</button>
+              <button class="small-btn" id="restart">처음부터</button>
+            </div>
+            <p class="note">한글 타이포그래피는 이미지 생성 AI에서 가끔 어색하게 나올 수 있어요. 그래서 문구, 글씨 스타일, 위치를 최대한 구체적으로 지시하도록 만들었습니다.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </section>
+</div>
+
+<div class="footer" id="footerNav">
+  <div class="footer-inner">
+    <button class="btn secondary" id="prevBtn">이전</button>
+    <button class="btn primary" id="nextBtn">다음 단계로</button>
+  </div>
+</div>
+
+<script>
+const state = {
+  relation:"",
+  feelings:[],
+  moods:[],
+  concept:"",
+  conceptCategory:"전체",
+  density:"적당히 풍성",
+  message:"",
+  font:"단정한 명조",
+  position:"상단 왼쪽"
+};
+
+let step=1;
+const $=(s)=>document.querySelector(s);
+const $$=(s)=>[...document.querySelectorAll(s)];
+
+const categories = ["전체","전통·격조","달빛·풍경","귀여운·다정한","모던·세련된","플라워·감성"];
+
+const concepts = [
+  {name:"한지 위의 보름달",category:"전통·격조",subtitle:"한지 질감 · 수묵 여백 · 정갈한 품격",theme:"theme-hanji",
+   poster:`<span class="moon" style="left:24px; top:26px;"></span><div class="cloud" style="left:24px; right:88px; top:110px;"></div><div class="mount" style="left:-6px; bottom:0; width:72%; height:28%; background:rgba(72,84,98,.18);"></div><div class="mount" style="right:-8px; bottom:0; width:58%; height:24%; background:rgba(72,84,98,.12);"></div>`,
+   scene:"한지 질감이 살아 있는 화면 위에 둥근 보름달과 먹빛 산 능선, 절제된 여백이 아름답게 어우러지는 장면",colors:"한지 아이보리, 먹색, 옅은 황금색, 연회색",style:"전통 한국화와 수묵화 느낌, 정갈한 미니멀 아트",place:"주요 장면은 하단과 우측에 절제되게 배치한다",deco:"엷은 구름, 아주 미세한 한지 질감, 은은한 먹 번짐",premium:"고급 전통 카드 브랜드처럼 정갈하고 깊이 있는 무드를 만든다"},
+  {name:"복주머니에 담은 힘",category:"전통·격조",subtitle:"복주머니 · 매듭 · 현대적 전통미",theme:"theme-trad",
+   poster:`<span class="moon" style="right:18px; top:20px;"></span><div class="pouch" style="right:22px; bottom:28px;"></div><div class="flower" style="left:24px; bottom:52px; width:48px; height:48px;"></div><div class="land" style="background:linear-gradient(180deg,rgba(255,169,109,.18),rgba(255,115,102,.12));"></div>`,
+   scene:"전통 복주머니와 매듭, 작은 꽃가지가 어우러지고 복주머니 안에서 따뜻한 빛이 은은하게 퍼지는 장면",colors:"아이보리, 딥레드, 뮤트 골드, 연한 민트",style:"현대적으로 재해석한 한국 전통 일러스트와 미니멀 그래픽",place:"주요 장면은 하단 오른쪽에 배치한다",deco:"보름달, 얇은 구름, 작은 꽃잎, 낮은 밀도의 전통 문양",premium:"풍요와 복을 상징하는 추석의 상징성이 또렷하게 느껴지도록 한다"},
+  {name:"가을 창호의 따뜻한 불빛",category:"전통·격조",subtitle:"창호 무늬 · 실내 불빛 · 포근한 감성",theme:"theme-trad",
+   poster:`<div class="window"></div><div class="windowgrid"></div><div class="panel" style="left:18px; right:18px; top:18px; bottom:18px; background:linear-gradient(180deg,rgba(255,240,205,.86),rgba(255,213,123,.28));"></div><div class="flower" style="left:26px; bottom:28px; width:42px; height:42px; border-width:7px;"></div>`,
+   scene:"전통 창호창 너머로 따뜻한 불빛이 번지고 작은 꽃가지와 그림자가 함께 보이는 장면",colors:"웜 아이보리, 꿀빛 베이지, 브라운, 잔잔한 버건디",style:"창호 패턴을 현대적으로 해석한 감성 일러스트",place:"주요 장면은 화면 중앙과 하단에 안정적으로 배치한다",deco:"창호 격자, 빛 번짐, 가을 꽃잎, 잔잔한 그림자",premium:"명절 밤의 평안함이 전달되도록 아늑하고 품격 있게 표현한다"},
+  {name:"고운 한복 리본",category:"전통·격조",subtitle:"한복 디테일 · 리본 포인트 · 우아한 카드",theme:"theme-hanji",
+   poster:`<div class="panel" style="right:24px; bottom:32px; width:88px; height:112px; background:linear-gradient(180deg,#FFE9C9,#FFD7A9); border-radius:24px 24px 44px 44px;"></div><div class="ribbon" style="right:44px; bottom:106px; width:56px; height:22px; background:#FF7366;"></div><div class="ribbon" style="right:28px; bottom:84px; width:84px; height:12px; background:#FFC935; transform:rotate(-22deg);"></div><div class="land" style="opacity:.45; background:linear-gradient(180deg,rgba(36,107,253,.08),rgba(36,107,253,.03));"></div>`,
+   scene:"한복 저고리와 리본 디테일을 모티프로 한 우아하고 여성스러운 장면",colors:"크림 베이지, 로즈 핑크, 딥와인, 뮤트 골드",style:"패션 일러스트 감성의 고급 한복 모티프 카드",place:"주요 장면은 하단 오른쪽에 우아하게 배치한다",deco:"리본 곡선, 한복 패턴, 작은 금박 느낌, 은은한 여백",premium:"정교한 한국적 디테일이 살아 있는 프리미엄 카드 느낌을 만든다"},
+
+  {name:"금빛 들판의 약속",category:"달빛·풍경",subtitle:"황금 들판 · 풍요 · 따뜻한 노을 감성",theme:"theme-night",
+   poster:`<span class="moon" style="right:20px; top:22px;"></span><div class="land" style="height:42%; background:linear-gradient(180deg,rgba(255,201,53,.16),rgba(255,180,124,.32));"></div><div class="ribbon" style="left:28px; bottom:34px; width:88px; height:3px; background:rgba(189,138,35,.55); transform:rotate(8deg);"></div><div class="ribbon" style="left:24px; bottom:54px; width:86px; height:3px; background:rgba(189,138,35,.48); transform:rotate(-6deg);"></div>`,
+   scene:"황금빛 들판과 은은한 달빛이 어우러져 풍요로운 한가위의 정서를 전하는 장면",colors:"골든 베이지, 아이보리, 올리브 그린, 소프트 브라운",style:"따뜻한 감성 일러스트와 풍경형 카드 디자인",place:"주요 장면은 하단 전반에 넓게 펼쳐지도록 배치한다",deco:"억새, 들판 결, 둥근 달빛, 연한 노을",premium:"추석의 풍요로움과 여유가 한눈에 느껴지도록 넓은 풍경감을 살린다"},
+  {name:"구름달과 학의 응원",category:"달빛·풍경",subtitle:"학 실루엣 · 구름 · 고요한 전통미",theme:"theme-night",
+   poster:`<span class="moon" style="right:18px; top:20px;"></span><div class="cloud" style="left:20px; right:80px; top:88px;"></div><div class="cloud" style="left:42px; right:104px; top:104px;"></div><div class="crane" style="left:42px; top:118px; transform:rotate(-8deg);"></div><div class="crane" style="left:86px; top:108px; transform:rotate(8deg);"></div><div class="land" style="background:linear-gradient(180deg,rgba(36,107,253,.10),rgba(25,199,167,.08));"></div>`,
+   scene:"보름달과 얇은 구름 사이로 학이 유려하게 날아가는 우아한 장면",colors:"아이보리, 딥네이비, 연한 골드, 뮤트 그레이",style:"절제된 동양화 감성의 세련된 전통 카드",place:"주요 장면은 상단 오른쪽과 중단부에 흐르듯 배치한다",deco:"유려한 구름선, 학 실루엣, 은은한 달빛",premium:"차분하고 품격 있는 한국적 분위기가 느껴지도록 비례와 여백을 정제한다"},
+  {name:"소나무와 보름달",category:"달빛·풍경",subtitle:"소나무 실루엣 · 깊은 밤 · 정적인 아름다움",theme:"theme-night",
+   poster:`<span class="moon" style="right:24px; top:20px;"></span><div class="ribbon" style="left:34px; bottom:30px; width:6px; height:78px; background:#4A6B5F;"></div><div class="leaf" style="left:16px; bottom:92px; width:26px; height:12px; background:#4A6B5F; transform:rotate(-18deg);"></div><div class="leaf" style="left:24px; bottom:110px; width:34px; height:14px; background:#4A6B5F; transform:rotate(12deg);"></div><div class="leaf" style="left:18px; bottom:72px; width:40px; height:14px; background:#4A6B5F; transform:rotate(6deg);"></div><div class="mount" style="right:-8px; bottom:0; width:82%; height:24%; background:rgba(65,83,107,.16);"></div>`,
+   scene:"은은한 보름달 아래 소나무 실루엣과 산 능선이 차분하게 이어지는 장면",colors:"웜 화이트, 딥그린, 차콜 네이비, 골드 옐로우",style:"정갈한 한국 풍경 일러스트",place:"주요 장면은 좌하단에서 우하단으로 흐르듯 배치한다",deco:"소나무 가지, 산 능선, 얇은 구름, 맑은 밤 공기",premium:"절제된 전통 풍경의 깊이를 살려 명상적인 아름다움을 전한다"},
+  {name:"달빛 아래 정자",category:"달빛·풍경",subtitle:"정자 · 산수 · 고요한 명절 밤",theme:"theme-hanji",
+   poster:`<span class="moon" style="right:24px; top:18px;"></span><div class="panel" style="left:34px; bottom:34px; width:72px; height:10px; background:#B87B4B; border-radius:999px;"></div><div class="arch" style="left:42px; bottom:44px; width:54px; height:18px; background:#FF8A65;"></div><div class="ribbon" style="left:44px; bottom:60px; width:8px; height:24px; background:#B87B4B;"></div><div class="ribbon" style="left:84px; bottom:60px; width:8px; height:24px; background:#B87B4B;"></div><div class="mount" style="right:-10px; bottom:0; width:72%; height:26%; background:rgba(36,107,253,.10);"></div>`,
+   scene:"달빛이 비치는 한적한 정자와 부드러운 산수 풍경이 이어지는 장면",colors:"아이보리, 코랄 브라운, 미스트 블루, 은은한 골드",style:"한국 산수화 감성의 부드러운 일러스트",place:"주요 장면은 하단 왼쪽에 작게, 풍경은 넓게 펼친다",deco:"부드러운 산 능선, 물가 안개, 달빛 기운",premium:"풍경의 숨결과 여백이 살아있는 정통 추석 카드 무드를 만든다"},
+
+  {name:"달토끼의 선물",category:"귀여운·다정한",subtitle:"귀여운 캐릭터 · 선물 · 사랑스러운 분위기",theme:"theme-garden",
+   poster:`<span class="moon" style="right:18px; top:20px;"></span><div class="rabbit" style="left:26px; bottom:30px;"></div><div class="pouch" style="right:22px; bottom:34px; width:60px; height:70px;"></div><div class="land" style="background:linear-gradient(180deg,rgba(25,199,167,.10),rgba(25,199,167,.06));"></div>`,
+   scene:"작고 귀여운 달토끼가 복주머니 선물을 곁에 두고 환하게 미소 짓는 장면",colors:"크림, 살구, 버터 옐로, 소프트 브라운",style:"귀엽고 사랑스러운 캐릭터 일러스트",place:"주요 장면은 하단 중앙에서 오른쪽에 배치한다",deco:"작은 별, 둥근 구름, 리본 장식, 부드러운 달빛",premium:"귀엽지만 유치하지 않게, 선물 카드처럼 완성도 높은 밸런스를 유지한다"},
+  {name:"달빛 아래 작은 응원",category:"귀여운·다정한",subtitle:"보름달 · 토끼 · 부드러운 수채화",theme:"theme-garden",
+   poster:`<span class="moon" style="right:18px; top:18px;"></span><div class="rabbit" style="left:22px; bottom:28px;"></div><div class="rabbit" style="left:74px; bottom:28px; width:54px; height:64px;"></div><div class="land" style="background:linear-gradient(180deg,rgba(91,192,255,.08),rgba(25,199,167,.08));"></div>`,
+   scene:"은은한 보름달 아래 귀여운 토끼 두 마리가 나란히 앉아 서로를 응원하는 장면",colors:"크림 아이보리, 살구, 부드러운 네이비, 은은한 골드",style:"부드러운 수채화와 심플 일러스트의 조합",place:"주요 장면은 하단 왼쪽에 배치한다",deco:"작은 별, 얇은 구름, 달빛, 잔잔한 억새",premium:"친근하고 따뜻한 감정을 부담 없이 전달하는 카드 무드를 만든다"},
+  {name:"송편 소풍",category:"귀여운·다정한",subtitle:"송편 · 피크닉 · 한가위의 사랑스러움",theme:"theme-trad",
+   poster:`<span class="moon" style="right:18px; top:18px; width:56px; height:56px;"></span><div class="panel" style="left:26px; bottom:34px; width:94px; height:22px; background:#F7E6C5; border-radius:999px;"></div><div class="panel" style="left:34px; bottom:42px; width:20px; height:10px; background:#A6E2D2; border-radius:999px;"></div><div class="panel" style="left:58px; bottom:42px; width:20px; height:10px; background:#FFD66B; border-radius:999px;"></div><div class="panel" style="left:82px; bottom:42px; width:20px; height:10px; background:#FFAA95; border-radius:999px;"></div>`,
+   scene:"작은 쟁반 위의 알록달록한 송편이 귀엽게 놓여 있는 소풍 같은 장면",colors:"아이보리, 민트, 버터 옐로, 피치 코랄",style:"사랑스럽고 깔끔한 캐릭터 일러스트",place:"주요 장면은 하단 중앙에 안정적으로 배치한다",deco:"작은 구름, 리본, 가벼운 꽃잎, 소프트 패턴",premium:"추석의 대표 음식인 송편을 깔끔하고 예쁘게 보여주는 카드형 비주얼로 만든다"},
+  {name:"두 토끼의 달맞이",category:"귀여운·다정한",subtitle:"짝 토끼 · 달맞이 · 다정한 인사",theme:"theme-night",
+   poster:`<span class="moon" style="left:54px; top:22px; width:70px; height:70px;"></span><div class="rabbit" style="left:34px; bottom:28px; width:58px; height:68px;"></div><div class="rabbit" style="left:86px; bottom:28px; width:58px; height:68px;"></div><div class="cloud" style="left:26px; right:26px; top:112px;"></div>`,
+   scene:"작은 토끼 두 마리가 함께 보름달을 바라보며 나란히 앉아 있는 장면",colors:"연한 블루, 크림, 바닐라 옐로, 피치 베이지",style:"동화 같은 귀여운 일러스트",place:"주요 장면은 하단 중앙에 대칭적으로 배치한다",deco:"달빛 후광, 얇은 구름, 별빛 점묘",premium:"받는 사람이 미소 지을 수 있도록 정서적인 귀여움을 세련되게 표현한다"},
+
+  {name:"미니멀 문살과 달빛",category:"모던·세련된",subtitle:"문살 패턴 · 여백 · 에디토리얼 감성",theme:"theme-modern",
+   poster:`<div class="panel" style="left:20px; right:20px; top:20px; bottom:20px; border:2px solid rgba(36,107,253,.12); background:linear-gradient(180deg,rgba(255,255,255,.76),rgba(246,249,255,.75));"></div><div class="panel" style="left:50%; top:20px; bottom:20px; width:2px; transform:translateX(-50%); background:rgba(36,107,253,.08);"></div><span class="moon" style="right:30px; top:34px; width:56px; height:56px;"></span>`,
+   scene:"모던한 문살 패턴과 보름달 하나만으로 여백의 미를 살린 장면",colors:"화이트, 코발트 블루, 소프트 골드, 쿨그레이",style:"모던 에디토리얼 카드 디자인",place:"주요 장면은 상단과 우측에 절제되게 배치한다",deco:"얇은 라인, 문살 패턴, 은은한 그림자",premium:"편집숍 카드처럼 깔끔하고 감각적인 한국적 미니멀을 만든다"},
+  {name:"코발트 문패 한가위",category:"모던·세련된",subtitle:"코발트 포인트 · 한글 카드 느낌 · 세련미",theme:"theme-modern",
+   poster:`<div class="panel" style="left:26px; right:26px; top:30px; height:84px; background:linear-gradient(135deg,#246BFD,#5BC0FF);"></div><div class="panel" style="left:42px; right:42px; top:48px; height:10px; background:rgba(255,255,255,.8); border-radius:999px;"></div><div class="panel" style="left:42px; right:62px; top:68px; height:10px; background:rgba(255,255,255,.72); border-radius:999px;"></div><div class="land" style="background:linear-gradient(180deg,rgba(36,107,253,.07),rgba(25,199,167,.06));"></div>`,
+   scene:"선명한 코발트 컬러 블록과 넓은 여백이 어우러진 감각적인 카드 장면",colors:"코발트 블루, 화이트, 스카이블루, 은은한 민트",style:"브랜드 포스터 같은 현대적 카드 디자인",place:"주요 장면은 상단에 과감하게 배치하고 나머지는 여백으로 둔다",deco:"절제된 라인, 컬러 블록, 심플한 달빛 포인트",premium:"젊고 감각적인 인상을 주면서도 추석 카드의 정체성을 잃지 않게 한다"},
+  {name:"골드 라인 한가위",category:"모던·세련된",subtitle:"골드 포인트 · 고급 라인워크 · 미니멀",theme:"theme-modern",
+   poster:`<div class="panel" style="inset:26px; border:2px solid rgba(255,201,53,.54); background:linear-gradient(180deg,#FFFFFF,#FAFCFF);"></div><span class="moon" style="right:34px; top:34px; width:48px; height:48px;"></span><div class="ribbon" style="left:34px; right:34px; bottom:56px; height:2px; background:rgba(255,201,53,.52);"></div>`,
+   scene:"정갈한 화이트 배경 위에 얇은 골드 라인과 달빛이 놓인 고급스러운 장면",colors:"화이트, 골드 옐로우, 쿨그레이, 연한 블루",style:"프리미엄 초대장 같은 미니멀 카드 디자인",place:"주요 장면은 화면 가장자리와 상단에 섬세하게 배치한다",deco:"얇은 금선, 절제된 구도, 작은 달빛 포인트",premium:"과한 장식 없이도 고급스럽고 명절다운 인상이 느껴지도록 한다"},
+  {name:"모던 산수와 달 원",category:"모던·세련된",subtitle:"원형 그래픽 · 산수 실루엣 · 절제된 감성",theme:"theme-modern",
+   poster:`<div class="panel" style="left:50%; top:26px; width:118px; height:118px; transform:translateX(-50%); border-radius:50%; background:linear-gradient(180deg,#EAF3FF,#F6FBFF); border:2px solid rgba(36,107,253,.12);"></div><div class="mount" style="left:20px; bottom:0; width:84%; height:26%; background:rgba(36,107,253,.10);"></div><div class="mount" style="right:12px; bottom:0; width:46%; height:20%; background:rgba(25,199,167,.12);"></div>`,
+   scene:"원형 그래픽 안에 산 능선과 달빛을 담아낸 현대적인 추석 장면",colors:"화이트, 코발트, 민트, 미스트 블루",style:"그래픽 포스터 감성의 모던 전통 카드",place:"주요 장면은 상단 중앙에 배치하고 하단은 안정된 풍경으로 받친다",deco:"원형 프레임, 산수 실루엣, 절제된 컬러 포인트",premium:"전통 산수의 감성을 현대 그래픽 언어로 세련되게 재해석한다"},
+
+  {name:"들꽃 바람 한가위",category:"플라워·감성",subtitle:"들꽃 · 바람 · 산뜻한 감성 일러스트",theme:"theme-flower",
+   poster:`<span class="moon" style="right:24px; top:20px; width:54px; height:54px;"></span><div class="flower" style="left:26px; bottom:34px; width:48px; height:48px;"></div><div class="flower" style="left:74px; bottom:82px; width:34px; height:34px; border-width:6px;"></div><div class="land" style="background:linear-gradient(180deg,rgba(91,192,255,.06),rgba(25,199,167,.08));"></div>`,
+   scene:"가을 들꽃과 흩날리는 꽃잎 사이로 부드러운 바람이 느껴지는 산뜻한 장면",colors:"연분홍, 크림 아이보리, 세이지그린, 연노랑",style:"감성적인 플로럴 일러스트와 담백한 수채화",place:"주요 장면은 하단과 측면 가장자리를 따라 자연스럽게 배치한다",deco:"들꽃, 꽃잎, 부드러운 바람선, 작은 빛 알갱이",premium:"산뜻하면서도 명절의 따뜻한 여운이 남도록 플로럴 분위기를 정돈한다"},
+  {name:"국화 향기 편지",category:"플라워·감성",subtitle:"국화 · 편지지 · 차분한 감성",theme:"theme-flower",
+   poster:`<div class="panel" style="left:30px; top:38px; width:84px; height:104px; background:#FFF9EE; border-radius:12px;"></div><div class="flower" style="right:24px; bottom:36px; width:52px; height:52px;"></div><div class="flower" style="right:68px; bottom:84px; width:34px; height:34px; border-width:6px;"></div>`,
+   scene:"국화가 곁들여진 편지지와 포근한 가을 빛이 어우러진 장면",colors:"버터 옐로우, 웜화이트, 라이트 올리브, 피치 베이지",style:"감성 문구 카드 같은 일러스트",place:"주요 장면은 좌상단과 우하단에 분산 배치한다",deco:"국화 꽃잎, 편지 질감, 잔잔한 그림자",premium:"문구 편집숍 카드처럼 차분하고 섬세한 감성을 살린다"},
+  {name:"은행잎과 가을 편지",category:"플라워·감성",subtitle:"은행잎 · 편지 · 산뜻한 가을 무드",theme:"theme-flower",
+   poster:`<div class="panel" style="left:36px; top:34px; width:86px; height:94px; background:#FFFFFF; border:1px solid rgba(255,201,53,.22); border-radius:14px;"></div><div class="ginkgo" style="right:28px; bottom:38px; background:#FFD84D;"></div><div class="ginkgo" style="right:76px; bottom:76px; width:36px; height:36px; background:#FFE68A;"></div>`,
+   scene:"편지와 은행잎이 함께 놓여 가을 안부를 전하는 장면",colors:"화이트, 라이트 골드, 스카이블루, 소프트 올리브",style:"밝고 산뜻한 감성 일러스트",place:"주요 장면은 우하단과 좌상단을 잇는 대각선 구도로 배치한다",deco:"은행잎, 편지 종이, 가벼운 바람선, 작은 빛점",premium:"선물 카드처럼 가볍고 기분 좋은 가을 감성을 추석 테마로 연결한다"},
+  {name:"감나무 아래 안부",category:"플라워·감성",subtitle:"감 열매 · 가을 나무 · 정겨운 풍경",theme:"theme-garden",
+   poster:`<div class="ribbon" style="left:32px; bottom:34px; width:6px; height:82px; background:#8B6142;"></div><div class="leaf" style="left:18px; bottom:98px; width:30px; height:18px; background:#6FBF8E; transform:rotate(-18deg);"></div><div class="leaf" style="left:36px; bottom:116px; width:32px; height:18px; background:#6FBF8E; transform:rotate(18deg);"></div><div class="sun" style="right:24px; top:20px;"></div><div class="panel" style="left:22px; bottom:84px; width:18px; height:18px; border-radius:50%; background:#FF8A65;"></div><div class="panel" style="left:52px; bottom:102px; width:18px; height:18px; border-radius:50%; background:#FF8A65;"></div>`,
+   scene:"감나무 아래 주황빛 감 열매와 부드러운 가을빛이 정겹게 어우러진 장면",colors:"아이보리, 감색 코랄, 리프 그린, 소프트 옐로우",style:"정겨운 생활풍 감성 일러스트",place:"주요 장면은 하단 왼쪽에 두고 상단은 여백으로 연다",deco:"감잎, 작은 새, 가을빛 후광, 옅은 구름",premium:"한국적인 가을 풍경이 자연스럽게 녹아든 정감 있는 추석 카드로 만든다"}
+];
+
+function conceptByName(name){
+  return concepts.find(c=>c.name===name) || concepts[0];
+}
+
+function renderCategoryTabs(){
+  $("#conceptCategoryTabs").innerHTML = categories.map(cat => `<button class="cat-tab ${state.conceptCategory===cat ? 'active':''}" data-cat="${cat}">${cat}</button>`).join('');
+  $$("#conceptCategoryTabs .cat-tab").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      state.conceptCategory = btn.dataset.cat;
+      renderCategoryTabs();
+      renderConceptGrid();
+    });
+  });
+}
+function renderConceptGrid(){
+  const list = state.conceptCategory==="전체" ? concepts : concepts.filter(c=>c.category===state.conceptCategory);
+  $("#conceptGrid").innerHTML = list.map(c => `
+    <button class="concept-card ${state.concept===c.name ? 'active':''}" data-value="${c.name}">
+      <div class="poster ${c.theme}">
+        <span class="stamp">${c.category}</span>
+        <div class="frame"></div>
+        ${c.poster}
+        <span class="sparkle" style="right:30px; top:76px;"></span>
+        <span class="sparkle" style="right:58px; top:56px; width:4px; height:4px;"></span>
+        <div class="mist"></div>
+        <div class="titlechip">${c.name}</div>
+      </div>
+      <div class="concept-info">
+        <div class="concept-copy">
+          <span class="concept-badge">${c.category}</span>
+          <h3>${c.name}</h3>
+          <p>${c.subtitle}</p>
+        </div>
+        <span class="concept-cta">선택하기</span>
+      </div>
+    </button>
+  `).join('');
+  $$("#conceptGrid .concept-card").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      state.concept = btn.dataset.value;
+      renderConceptGrid();
+      updateNext();
+    });
+  });
+}
+
+function bindSingle(containerSelector, stateKey){
+  $$(containerSelector+" [data-value]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      $$(containerSelector+" [data-value]").forEach(x=>x.classList.remove("active"));
+      btn.classList.add("active");
+      state[stateKey]=btn.dataset.value;
+      if(stateKey==="relation"){
+        $("#customRelationWrap").classList.toggle("hidden", state.relation!=="직접 입력");
+      }
+      updateNext();
+    });
+  });
+}
+function bindMulti(containerSelector, stateKey, max=2){
+  $$(containerSelector+" [data-value]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const v=btn.dataset.value;
+      const arr=state[stateKey];
+      if(arr.includes(v)){
+        state[stateKey]=arr.filter(x=>x!==v);
+        btn.classList.remove("active");
+      }else{
+        if(arr.length>=max) return;
+        arr.push(v);
+        btn.classList.add("active");
+      }
+      updateNext();
+    });
+  });
+}
+bindSingle("#relationChoices","relation");
+bindMulti("#feelingChoices","feelings",2);
+bindMulti("#moodChoices","moods",2);
+bindSingle("#densityChoices","density");
+bindSingle("#fontChoices","font");
+bindSingle("#positionChoices","position");
+$("#customRelation").addEventListener("input",updateNext);
+$("#customMessage").addEventListener("input",()=>{
+  if($("#customMessage").value.trim()) state.message=$("#customMessage").value.trim();
+  updateNext();
+});
+
+function baseMessages(){
+  if(state.relation==="부모님"){
+    return [
+      ["늘 든든하게 있어줘서","고맙고 또 고마워요.","편안한 추석 보내세요."],
+      ["이번 추석엔 푹 쉬고,","맛있는 것도 많이 드시고,","건강하게 웃어요."],
+      ["자주 말하진 못해도","늘 마음에 있어요.","따뜻한 한가위 보내세요."],
+      ["한가위만큼은 걱정 내려두고,","편안하게 쉬셨으면 해요.","늘 건강하세요."],
+      ["이번 추석에도","웃는 일 가득하시고,","마음 편한 시간 보내세요."],
+      ["늘 받은 사랑이 많아서","더 잘하고 싶은 마음이에요.","따뜻한 추석 보내세요."],
+      ["몸도 마음도 편안한","추석 연휴 보내시고,","좋은 기운 가득 받으세요."],
+      ["멀리 있어도 마음은 가까워요.","맛있는 것 많이 드시고,","행복한 한가위 보내세요."],
+      ["고마운 마음 담아","안부 전해요.","늘 평안하시길 바라요."],
+      ["이번 명절엔","환한 웃음 많이 지으시고,","좋은 추억 많이 만드세요."],
+      ["늘 저를 생각해주셔서","감사한 마음뿐이에요.","포근한 추석 보내세요."],
+      ["가족과 함께","따뜻하고 넉넉한","한가위 보내세요."]
+    ];
+  }
+  if(state.relation==="직장·지인"){
+    return [
+      ["늘 평안하시길 바랍니다.","편안한 추석 보내시고,","좋은 일 가득하시길 바랍니다."],
+      ["바쁜 일상은 잠시 내려두고,","여유와 웃음이 함께하는","한가위 보내시길 바랍니다."],
+      ["함께해 주셔서 감사합니다.","따뜻한 명절 보내시고,","늘 건강하시길 바랍니다."],
+      ["풍요로운 한가위 보내시고,","가정에 웃음과 평안이","가득하시길 바랍니다."],
+      ["한 해의 수고를 잠시 내려두고,","편안한 추석 연휴","보내시길 바랍니다."],
+      ["고운 달빛처럼","따뜻한 일들만 가득한","한가위 되시길 바랍니다."],
+      ["명절 동안 푹 쉬시고,","다시 뵐 때 더 밝은 모습으로","인사드리겠습니다."],
+      ["정겨운 사람들과 함께","행복한 추석 보내시고,","늘 좋은 일만 있으시길 바랍니다."],
+      ["늘 감사드립니다.","풍요롭고 넉넉한","한가위 보내세요."],
+      ["환한 보름달처럼","마음도 넉넉해지는","추석 보내시길 바랍니다."],
+      ["따뜻한 연휴 보내시고,","건강과 행복이","늘 함께하시길 바랍니다."],
+      ["가정에 평안이 머물고","일상엔 좋은 기운이 이어지는","한가위 되시길 바랍니다."]
+    ];
+  }
+  return [
+    ["잘 지내고 있지?","이번 추석엔 푹 쉬고,","좋은 일만 가득하길!"],
+    ["맛있는 건 많이 먹고,","걱정은 잠깐 내려두자!","늘 네 편이야."],
+    ["멀리 있어도 생각난다.","건강하게 잘 지내고,","웃을 일 많은 추석 보내!"],
+    ["이번 추석엔","마음도 몸도 좀 쉬자.","좋은 기운 듬뿍 받길!"],
+    ["맛있는 거 잔뜩 먹고,","행복 충전도 많이 하고,","여유로운 한가위 보내!"],
+    ["문득 네 생각이 나서","안부 남긴다.","따뜻한 추석 보내!"],
+    ["잘 쉬고 잘 먹고","웃는 일 많은","추석 연휴 보내자!"],
+    ["이번 한가위엔","걱정보다 웃음이","더 많은 날이길!"],
+    ["늘 고맙고 든든해.","이번 추석도","행복하게 보내길 바라!"],
+    ["너답게 환하게,","편안하게 쉬는","추석이었으면 좋겠다!"],
+    ["보름달처럼","마음도 둥글게 채우는","한가위 보내!"],
+    ["올해 추석은","좋은 사람들, 좋은 음식,","좋은 기분으로 꽉 채우자!"]
+  ];
+}
+function renderMessages(){
+  const root=$("#messageChoices");
+  root.innerHTML="";
+  baseMessages().forEach((lines,i)=>{
+    const text=lines.join("\n");
+    const card=document.createElement("div");
+    card.className="message-card"+(i===0&&!state.message?" active":"");
+    card.innerHTML=`<div class="message-text">${lines.join("<br>")}</div><button class="pick">이 문구 선택</button>`;
+    card.addEventListener("click",()=>{
+      $$(".message-card").forEach(x=>x.classList.remove("active"));
+      card.classList.add("active");
+      state.message=text;
+      $("#customMessage").value="";
+      updateNext();
+    });
+    root.appendChild(card);
+    if(i===0 && !state.message) state.message=text;
+  });
+}
+
+function buildFinal(){
+  const d=conceptByName(state.concept);
+  const rel=state.relation;
+  const feelings=state.feelings.join(", ");
+  const moods=state.moods.join(", ");
+  const msg=state.message.trim();
+  $("#previewText").innerHTML=msg.replaceAll("\n","<br>");
+  const tags=[rel, d.category, ...state.feelings, ...state.moods, state.font];
+  $("#tags").innerHTML=tags.map(t=>`<span class="tag">${t}</span>`).join("");
+
+  const densityText = state.density==="미니멀"
+    ? "장식 요소는 절제해 사용하고, 여백의 아름다움이 느껴지도록 정돈한다."
+    : state.density==="화려하게"
+    ? "전통 장식, 꽃잎, 달빛, 구름, 가을 포인트를 풍성하게 사용하되 글씨 가독성을 해치지 않도록 조절한다."
+    : "카드가 비어 보이지 않도록 앞·중간·뒤 레이어를 만들고 보조 장식을 적당히 풍성하게 배치한다.";
+
+  const prompt = `세로형 9:16 비율의 완성형 한국 추석 인사 카드를 디자인한다.
+
+[카드 목적]
+받는 사람: ${rel}
+전하고 싶은 마음: ${feelings}
+전체 분위기: ${moods}
+
+[전체 아트디렉션]
+이 카드는 누가 봐도 “추석 카드답다”, “카드가 멋있다”라는 느낌이 들도록 완성도 높게 표현한다.
+한국적인 추석 정서, 보름달의 풍요감, 가을의 따뜻한 기운, 명절의 단정함이 자연스럽게 느껴져야 한다.
+백화점 카드 브랜드나 프리미엄 편집숍 카드처럼 세련되고 완성도 높은 비주얼을 목표로 한다.
+색감은 선명하되 촌스럽지 않게 정리하고, 장면과 글씨와 장식이 하나의 완성된 카드처럼 어우러지게 한다.
+
+[콘셉트]
+콘셉트 카테고리: ${d.category}
+콘셉트 이름: ${d.name}
+주요 장면: ${d.scene}
+주요 색상: ${d.colors}
+표현 스타일: ${d.style}
+콘셉트 포인트: ${d.premium}
+
+[구도]
+${d.place}.
+인사말은 ${state.position}에 배치한다.
+글씨 영역은 밝고 정돈되게 유지하되 완전히 비우지 말고, ${d.deco} 같은 요소를 매우 은은하게 넣어 카드가 심심해 보이지 않게 한다.
+주요 장면과 글씨가 서로 겹치지 않도록 충분한 안전 여백을 확보한다.
+주요 인물과 사물은 화면 가장자리에서 잘리지 않도록 한다.
+${densityText}
+
+[글씨]
+카드 안에는 아래 문구를 정확한 한국어로 넣는다.
+
+"${msg}"
+
+글씨 스타일은 ${state.font} 느낌으로 표현한다.
+읽기 쉬운 한국어 타이포그래피를 사용하고, 문구가 카드의 중심 메시지가 되도록 적절한 크기와 행간을 준다.
+문구는 이미지에 묻히지 않게 또렷하게 보이되, 너무 딱딱한 포스터 문구처럼 보이지 말고 따뜻한 카드 문구처럼 자연스럽게 보여야 한다.
+
+[완성도]
+전통적인 한국의 추석 정서를 현대적이고 세련되게 재해석한다.
+앞·중간·뒤 레이어를 활용해 깊이감을 만들고, 달빛·구름·꽃잎·전통 문양·가을 요소들을 유기적으로 연결해 시선이 자연스럽게 문구로 향하도록 한다.
+이미지 안에는 선택한 인사말 외의 다른 한글, 영어, 숫자, 로고, 서명, 테두리, 워터마크를 넣지 않는다.`;
+
+  $("#finalPrompt").value=prompt;
+}
+
+function updateStep(){
+  $$(".step").forEach(s=>s.classList.toggle("hidden", Number(s.dataset.step)!==step));
+  const labels=["관계 선택","마음 선택","분위기 선택","콘셉트 선택","인사말 선택","글씨 설정","완성"];
+  $("#stepLabel").textContent=`STEP ${step} · ${labels[step-1]}`;
+  $("#stepCount").textContent=`${step} / 7`;
+  $("#bar").style.width=`${(step/7)*100}%`;
+  $("#prevBtn").style.visibility=step===1?"hidden":"visible";
+  $("#nextBtn").textContent=step===6?"프롬프트 만들기":"다음 단계로";
+  $("#footerNav").classList.toggle("hidden", step===7);
+  if(step===4){renderCategoryTabs();renderConceptGrid();}
+  if(step===5) renderMessages();
+  if(step===7) buildFinal();
+  updateNext();
+}
+function updateNext(){
+  let ok=false;
+  if(step===1) ok=!!state.relation && (state.relation!=="직접 입력" || $("#customRelation").value.trim());
+  if(step===2) ok=state.feelings.length>0;
+  if(step===3) ok=state.moods.length>0;
+  if(step===4) ok=!!state.concept;
+  if(step===5) ok=!!(state.message || $("#customMessage").value.trim());
+  if(step===6) ok=!!state.font && !!state.position;
+  $("#nextBtn").disabled=!ok;
+}
+
+$("#nextBtn").addEventListener("click",()=>{
+  if(step===1 && state.relation==="직접 입력") state.relation=$("#customRelation").value.trim();
+  if(step===5 && $("#customMessage").value.trim()) state.message=$("#customMessage").value.trim();
+  if(step<7){ step++; updateStep(); }
+});
+$("#prevBtn").addEventListener("click",()=>{ if(step>1){ step--; updateStep(); } });
+
+$("#toneWarm").addEventListener("click",()=>{
+  state.message="네 생각이 문득 났어.\n이번 추석엔 푹 쉬고,\n마음까지 따뜻하길!";
+  $("#customMessage").value=state.message; updateNext();
+});
+$("#toneFun").addEventListener("click",()=>{
+  state.message="맛있는 건 많이 먹고,\n걱정은 잠깐 쉬게 두자!\n웃는 일 많은 추석 보내!";
+  $("#customMessage").value=state.message; updateNext();
+});
+$("#toneShort").addEventListener("click",()=>{
+  state.message="이번 추석엔 푹 쉬고,\n좋은 일만 가득하길!";
+  $("#customMessage").value=state.message; updateNext();
+});
+
+async function copyText(text, button, originalLabel){
+  let ok = false;
+  try{
+    if(navigator.clipboard && window.isSecureContext){
+      await navigator.clipboard.writeText(text);
+      ok = true;
+    }
+  }catch(e){}
+  if(!ok){
+    try{
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly","");
+      ta.style.position = "fixed";
+      ta.style.left = "-9999px";
+      ta.style.top = "0";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      ta.setSelectionRange(0, ta.value.length);
+      ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+    }catch(e){}
+  }
+  if(ok){
+    button.textContent = "복사했어요 ✓";
+    setTimeout(()=>button.textContent = originalLabel, 1400);
+  }else{
+    const target = originalLabel === "프롬프트 복사" ? $("#finalPrompt") : $("#customMessage");
+    if(target){
+      if(originalLabel !== "프롬프트 복사" && !target.value) target.value = state.message;
+      target.focus();
+      target.select();
+    }
+    button.textContent = "선택됨 · Ctrl+C";
+    setTimeout(()=>button.textContent = originalLabel, 2200);
+  }
+}
+$("#finalBack").addEventListener("click", ()=>{
+  step = 6;
+  updateStep();
+});
+
+$("#copyPrompt").addEventListener("click", ()=>{ copyText($("#finalPrompt").value, $("#copyPrompt"), "프롬프트 복사"); });
+$("#copyMessage").addEventListener("click", ()=>{ copyText(state.message, $("#copyMessage"), "문구만 복사"); });
+$("#restart").addEventListener("click",()=>location.reload());
+
+updateStep();
+</script>
+</body>
+</html>
