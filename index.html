@@ -48,7 +48,7 @@ button:focus-visible{
 .app{
   width:min(100%,1080px);
   margin:0 auto;
-  padding:26px 18px 150px;
+  padding:26px 18px 42px;
 }
 .hero{margin-bottom:18px}
 .badge{
@@ -259,19 +259,18 @@ h1{
 .note{margin:10px 0 0;font-size:13px;color:var(--ink-soft);line-height:1.65}
 
 .footer{
-  position:fixed;
-  left:50%;
-  bottom:18px;
-  transform:translateX(-50%);
-  width:min(calc(100% - 28px),1080px);
-  z-index:9999;
-  background:rgba(255,255,255,.96);
+  position:sticky;
+  bottom:14px;
+  z-index:120;
+  width:min(100%,1080px);
+  margin:22px auto 0;
+  background:rgba(255,255,255,.97);
   backdrop-filter:blur(16px);
-  border:1px solid rgba(36,107,253,.10);
-  border-radius:22px;
+  border:1px solid rgba(36,107,253,.12);
+  border-radius:24px;
   box-shadow:
-    0 20px 48px rgba(36,107,253,.16),
-    0 6px 18px rgba(22,36,50,.08);
+    0 18px 42px rgba(36,107,253,.12),
+    0 6px 18px rgba(22,36,50,.06);
 }
 .footer-inner{
   width:100%;
@@ -281,12 +280,12 @@ h1{
   gap:12px;
 }
 .footer .btn.primary{
-  min-height:58px;
-  font-size:18px;
+  min-height:60px;
+  font-size:19px;
   letter-spacing:-.02em;
 }
 .footer .btn.secondary{
-  min-height:58px;
+  min-height:60px;
 }
 
 .btn{height:58px;border-radius:18px;padding:0 22px;font-size:17px;font-weight:900}
@@ -357,8 +356,9 @@ h1{
   .stepcount{margin-top:4px}
   .footer{
     bottom:10px;
-    width:calc(100% - 20px);
+    width:100%;
     border-radius:18px;
+    margin-top:18px;
   }
   .footer-inner{padding:10px}
   .btn{height:54px;font-size:16px}
@@ -624,15 +624,16 @@ h1{
         </div>
       </section>
     </div>
-  </section>
-</div>
-
-<div class="footer" id="footerNav">
+    <div class="footer" id="footerNav">
   <div class="footer-inner">
     <button class="btn secondary" id="prevBtn">이전</button>
     <button class="btn primary" id="nextBtn">다음 단계로</button>
   </div>
 </div>
+  </section>
+</div>
+
+
 
 <script>
 const state = {
