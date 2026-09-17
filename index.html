@@ -48,7 +48,7 @@ button:focus-visible{
 .app{
   width:min(100%,1080px);
   margin:0 auto;
-  padding:26px 18px 120px;
+  padding:26px 18px 150px;
 }
 .hero{margin-bottom:18px}
 .badge{
@@ -259,12 +259,36 @@ h1{
 .note{margin:10px 0 0;font-size:13px;color:var(--ink-soft);line-height:1.65}
 
 .footer{
-  position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.95);backdrop-filter:blur(14px);
-  border-top:1px solid rgba(22,36,50,.06);box-shadow:0 -10px 28px rgba(36,107,253,.07);
+  position:fixed;
+  left:50%;
+  bottom:18px;
+  transform:translateX(-50%);
+  width:min(calc(100% - 28px),1080px);
+  z-index:9999;
+  background:rgba(255,255,255,.96);
+  backdrop-filter:blur(16px);
+  border:1px solid rgba(36,107,253,.10);
+  border-radius:22px;
+  box-shadow:
+    0 20px 48px rgba(36,107,253,.16),
+    0 6px 18px rgba(22,36,50,.08);
 }
 .footer-inner{
-  width:min(100%,1080px);margin:0 auto;padding:12px 18px calc(12px + env(safe-area-inset-bottom));display:flex;gap:12px;
+  width:100%;
+  margin:0;
+  padding:12px;
+  display:flex;
+  gap:12px;
 }
+.footer .btn.primary{
+  min-height:58px;
+  font-size:18px;
+  letter-spacing:-.02em;
+}
+.footer .btn.secondary{
+  min-height:58px;
+}
+
 .btn{height:58px;border-radius:18px;padding:0 22px;font-size:17px;font-weight:900}
 .btn.secondary{
   min-width:112px;border:1px solid rgba(36,107,253,.12);background:linear-gradient(180deg,#FFFFFF,#F7FAFF);color:#344252;box-shadow:0 10px 18px rgba(36,107,253,.05);
@@ -275,7 +299,18 @@ h1{
   box-shadow:0 16px 32px rgba(36,107,253,.22), inset 0 1px 0 rgba(255,255,255,.24);
 }
 .btn.primary:hover:not(:disabled){transform:translateY(-2px) scale(1.01);box-shadow:0 22px 38px rgba(36,107,253,.28), inset 0 1px 0 rgba(255,255,255,.24)}
-.btn.primary:disabled{opacity:.42;cursor:not-allowed;transform:none}
+.btn.primary:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+  transform:none;
+  filter:grayscale(.08);
+  background:linear-gradient(135deg,#AFC2E8 0%, #B8DCD5 100%) !important;
+  box-shadow:none !important;
+}
+.text-input.invalid{
+  border-color:#FF7A6E !important;
+  box-shadow:0 0 0 4px rgba(255,95,82,.10);
+}
 
 #finalBack{
   background:linear-gradient(180deg,#FFFFFF,#EEF5FF)!important;
@@ -320,7 +355,12 @@ h1{
   .density-grid{grid-template-columns:1fr}
   .topmeta{display:block}
   .stepcount{margin-top:4px}
-  .footer-inner{padding-left:12px;padding-right:12px}
+  .footer{
+    bottom:10px;
+    width:calc(100% - 20px);
+    border-radius:18px;
+  }
+  .footer-inner{padding:10px}
   .btn{height:54px;font-size:16px}
 }
 
@@ -471,6 +511,9 @@ h1{
         </div>
         <div class="field hidden" id="customRelationWrap">
           <input class="text-input" id="customRelation" placeholder="예: 사촌언니, 은사님, 오래된 동료" />
+          <p id="customRelationHint" style="margin:10px 4px 0; font-size:14px; line-height:1.6; color:#FF5F52; font-weight:700; display:none;">
+            관계를 직접 입력해야 다음 단계로 넘어갈 수 있어요.
+          </p>
         </div>
       </section>
 
@@ -730,7 +773,15 @@ function bindSingle(containerSelector, stateKey){
       btn.classList.add("active");
       state[stateKey]=btn.dataset.value;
       if(stateKey==="relation"){
-        $("#customRelationWrap").classList.toggle("hidden", state.relation!=="직접 입력");
+        const isCustom = state.relation==="직접 입력";
+        $("#customRelationWrap").classList.toggle("hidden", !isCustom);
+        const hint = $("#customRelationHint");
+        const input = $("#customRelation");
+        if(hint) hint.style.display = "none";
+        if(input) input.classList.remove("invalid");
+        if(isCustom && input){
+          setTimeout(()=>input.focus(), 50);
+        }
       }
       updateNext();
     });
@@ -759,7 +810,15 @@ bindMulti("#moodChoices","moods",2);
 bindSingle("#densityChoices","density");
 bindSingle("#fontChoices","font");
 bindSingle("#positionChoices","position");
-$("#customRelation").addEventListener("input",updateNext);
+$("#customRelation").addEventListener("input",()=>{
+  const hint = $("#customRelationHint");
+  const input = $("#customRelation");
+  if(input && input.value.trim()){
+    input.classList.remove("invalid");
+    if(hint) hint.style.display = "none";
+  }
+  updateNext();
+});
 $("#customMessage").addEventListener("input",()=>{
   if($("#customMessage").value.trim()) state.message=$("#customMessage").value.trim();
   updateNext();
@@ -902,7 +961,7 @@ function updateStep(){
   $("#stepCount").textContent=`${step} / 7`;
   $("#bar").style.width=`${(step/7)*100}%`;
   $("#prevBtn").style.visibility=step===1?"hidden":"visible";
-  $("#nextBtn").textContent=step===6?"프롬프트 만들기":"다음 단계로";
+  
   $("#footerNav").classList.toggle("hidden", step===7);
   if(step===4){renderCategoryTabs();renderConceptGrid();}
   if(step===5) renderMessages();
@@ -917,11 +976,29 @@ function updateNext(){
   if(step===4) ok=!!state.concept;
   if(step===5) ok=!!(state.message || $("#customMessage").value.trim());
   if(step===6) ok=!!state.font && !!state.position;
-  $("#nextBtn").disabled=!ok;
+
+  const nextBtn = $("#nextBtn");
+  nextBtn.disabled = !ok;
+
+  if(step===1 && state.relation==="직접 입력" && !$("#customRelation").value.trim()){
+    nextBtn.textContent = "관계를 입력해 주세요";
+  }else{
+    nextBtn.textContent = step===6 ? "프롬프트 만들기" : "다음 단계로";
+  }
 }
 
 $("#nextBtn").addEventListener("click",()=>{
-  if(step===1 && state.relation==="직접 입력") state.relation=$("#customRelation").value.trim();
+  if(step===1 && state.relation==="직접 입력"){
+    const input = $("#customRelation");
+    const hint = $("#customRelationHint");
+    if(!input.value.trim()){
+      input.classList.add("invalid");
+      if(hint) hint.style.display = "block";
+      input.focus();
+      return;
+    }
+    state.relation = input.value.trim();
+  }
   if(step===5 && $("#customMessage").value.trim()) state.message=$("#customMessage").value.trim();
   if(step<7){ step++; updateStep(); }
 });
@@ -985,7 +1062,60 @@ $("#finalBack").addEventListener("click", ()=>{
 
 $("#copyPrompt").addEventListener("click", ()=>{ copyText($("#finalPrompt").value, $("#copyPrompt"), "프롬프트 복사"); });
 $("#copyMessage").addEventListener("click", ()=>{ copyText(state.message, $("#copyMessage"), "문구만 복사"); });
-$("#restart").addEventListener("click",()=>location.reload());
+function resetApp(){
+  state.relation = "";
+  state.feelings = [];
+  state.moods = [];
+  state.concept = "";
+  state.conceptCategory = "전체";
+  state.density = "적당히 풍성";
+  state.message = "";
+  state.font = "단정한 명조";
+  state.position = "상단 왼쪽";
+
+  step = 1;
+
+  // 선택 상태 초기화
+  $$(".choice-card, .chip, .position-btn, .concept-card, .message-card").forEach(el=>{
+    el.classList.remove("active");
+  });
+
+  // 기본 선택 상태 복원
+  const defaultDensity = document.querySelector('#densityChoices [data-value="적당히 풍성"]');
+  if(defaultDensity) defaultDensity.classList.add("active");
+
+  const defaultFont = document.querySelector('#fontChoices [data-value="단정한 명조"]');
+  if(defaultFont) defaultFont.classList.add("active");
+
+  const defaultPosition = document.querySelector('#positionChoices [data-value="상단 왼쪽"]');
+  if(defaultPosition) defaultPosition.classList.add("active");
+
+  // 입력값 초기화
+  if($("#customRelation")) {
+    $("#customRelation").value = "";
+    $("#customRelation").classList.remove("invalid");
+  }
+  if($("#customRelationHint")) $("#customRelationHint").style.display = "none";
+  if($("#customMessage")) $("#customMessage").value = "";
+  if($("#finalPrompt")) $("#finalPrompt").value = "";
+  if($("#previewText")) $("#previewText").innerHTML = "";
+  if($("#tags")) $("#tags").innerHTML = "";
+
+  // 직접 입력칸 숨기기
+  if($("#customRelationWrap")) $("#customRelationWrap").classList.add("hidden");
+
+  // 카테고리/콘셉트 재렌더링
+  renderCategoryTabs();
+  renderConceptGrid();
+
+  // 첫 단계 표시
+  updateStep();
+
+  // 화면 맨 위로 이동
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+$("#restart").addEventListener("click", resetApp);
 
 updateStep();
 </script>
